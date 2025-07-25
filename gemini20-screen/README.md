@@ -34,12 +34,21 @@ This project demonstrates how to integrate:
 
 2. **Install Python dependencies**
    ```bash
-   pip install google-genai==0.3.0 websockets urllib3
+   pip install -r requirements.txt
    ```
 
-3. **Configure API Key**
-   - Edit `main.py` and replace `GOOGLE_API_KEY` with your actual Google AI API key
-   - Or set as environment variable: `export GOOGLE_API_KEY="your-api-key-here"`
+3. **Configure Environment Variables**
+   - Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+   - Edit the `.env` file and add your actual Google AI API key:
+   ```bash
+   # Edit the .env file
+   GOOGLE_API_KEY=your-actual-api-key-here
+   ```
+   - Get your API key from: https://ai.google.dev/
+   - **Important**: Never commit your actual API key to version control!
 
 ## 🎯 Usage
 
@@ -71,22 +80,27 @@ python3 -m http.server 8000
 
 ```
 gemini20-screen/
-├── README.md              # This file
-├── main.py               # WebSocket server with Gemini integration
-├── index.html            # Web interface for screen sharing
-├── pcm-processor.js      # Audio worklet for real-time audio processing
-└── requirements.txt      # Python dependencies (optional)
+├── .env                  # Environment variables (API keys, config)
+├── .gitignore           # Git ignore file
+├── README.md            # This file
+├── main.py              # WebSocket server with Gemini integration
+├── index.html           # Web interface for screen sharing
+├── pcm-processor.js     # Audio worklet for real-time audio processing
+└── requirements.txt     # Python dependencies
 ```
 
 ## 🔧 Configuration
 
-### API Settings
-Edit these constants in `main.py`:
-```python
-GOOGLE_API_KEY = 'your-api-key-here'  # Your Google AI API key
-MODEL = "gemini-2.0-flash-exp"        # Gemini model to use
-WEBSOCKET_HOST = "localhost"          # Server host
-WEBSOCKET_PORT = 9083                 # Server port
+### Environment Variables
+Edit the `.env` file to configure the application:
+```bash
+# Required: Your Google AI API key
+GOOGLE_API_KEY=your-actual-api-key-here
+
+# Optional: Server configuration
+MODEL=gemini-2.0-flash-exp
+WEBSOCKET_HOST=localhost
+WEBSOCKET_PORT=9083
 ```
 
 ### Screen Capture Settings
@@ -136,10 +150,23 @@ Enable detailed logging by checking browser console and server terminal output.
 
 ## 🔒 Security Notes
 
-- **API Key**: Never commit your actual API key to version control
-- **SSL Bypass**: Current SSL bypass is for development only
-- **Local Development**: This demo is designed for localhost development
-- **HTTPS Required**: Production deployment requires HTTPS for WebRTC APIs
+- **API Key Security**: 
+  - API keys are stored in `.env` file (excluded from git)
+  - Never commit your actual API key to version control
+  - The `.env` file is already added to `.gitignore`
+  
+- **Environment Variables**:
+  - Use environment variables for all sensitive configuration
+  - The current `.env` contains a sample key - replace with your actual key
+  
+- **Development vs Production**:
+  - SSL bypass is for development only
+  - Production deployment requires proper HTTPS certificates
+  - This demo is designed for localhost development
+
+- **WebRTC Requirements**: 
+  - Screen sharing requires HTTPS or localhost
+  - Microphone access requires user permission
 
 ## 🌐 Browser Compatibility
 

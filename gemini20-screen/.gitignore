@@ -45,3 +45,6 @@ server.log
 # API Keys (Important: Never commit API keys!)
 config.py
 .env
+
+# Keep the example file
+!.env.example

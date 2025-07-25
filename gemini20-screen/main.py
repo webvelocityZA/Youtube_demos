@@ -20,17 +20,25 @@ import websockets
 import base64
 import ssl
 import urllib3
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Disable SSL warnings and verification
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Configuration
-GOOGLE_API_KEY = 'AIzaSyAd_IzkpER5K1iSloHSzSpIMfOWC-fEWgY'  # Replace with your API key
-MODEL = "gemini-2.0-flash-exp"
-WEBSOCKET_HOST = "localhost"
-WEBSOCKET_PORT = 9083
+# Configuration from environment variables
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+MODEL = os.getenv('MODEL', "gemini-2.0-flash-exp")
+WEBSOCKET_HOST = os.getenv('WEBSOCKET_HOST', "localhost")
+WEBSOCKET_PORT = int(os.getenv('WEBSOCKET_PORT', 9083))
 
-# Load API key from environment
+# Validate required environment variables
+if not GOOGLE_API_KEY:
+    raise ValueError("GOOGLE_API_KEY not found in environment variables. Please check your .env file.")
+
+# Set API key for Google client
 os.environ['GOOGLE_API_KEY'] = GOOGLE_API_KEY
 
 # SSL workaround for macOS certificate issues
