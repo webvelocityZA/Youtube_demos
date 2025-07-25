@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 2.0 Screen Sharing Demo</title>
+    
+    <!-- Material Design Components -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
@@ -37,7 +41,7 @@
         <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
                 <!-- Title -->
-                <span class="mdl-layout-title">Gemini Live Demo</span>
+                <span class="mdl-layout-title">🤖 Gemini 2.0 Screen Sharing Demo</span>
             </div>
         </header>
         <main class="mdl-layout__content">
@@ -68,7 +72,14 @@
     </div>
 
     <script defer>
+        // ===========================================
+        // Gemini 2.0 Screen Sharing Client
+        // ===========================================
+        
+        // Configuration
         const URL = "ws://localhost:9083";
+        
+        // DOM Elements
         const video = document.getElementById("videoElement");
         const canvas = document.getElementById("canvasElement");
         let context;
@@ -97,6 +108,11 @@
         // Function to start screen capture
         async function startScreenShare() {
             try {
+                // Check if getDisplayMedia is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                    throw new Error("Screen sharing not supported. Please use HTTPS or localhost.");
+                }
+
                 stream = await navigator.mediaDevices.getDisplayMedia({
                     video: {
                         width: { max: 640 },
@@ -114,6 +130,7 @@
 
             } catch (err) {
                 console.error("Error accessing the screen: ", err);
+                alert("Screen sharing error: " + err.message + "\n\nPlease use HTTPS or access via localhost.");
             }
         }
 
@@ -219,14 +236,34 @@
         async function initializeAudioContext() {
             if (initialized) return;
 
-            audioInputContext = new (window.AudioContext ||
-                window.webkitAudioContext)({
-                sampleRate: 24000
-            });
-            await audioInputContext.audioWorklet.addModule("pcm-processor.js");
-            workletNode = new AudioWorkletNode(audioInputContext, "pcm-processor");
-            workletNode.connect(audioInputContext.destination);
-            initialized = true;
+            try {
+                // Check if AudioContext is available
+                if (!window.AudioContext && !window.webkitAudioContext) {
+                    throw new Error("Web Audio API not supported");
+                }
+
+                audioInputContext = new (window.AudioContext ||
+                    window.webkitAudioContext)({
+                    sampleRate: 24000
+                });
+
+                // Check if audioWorklet is available
+                if (!audioInputContext.audioWorklet) {
+                    console.warn("AudioWorklet not available, using fallback");
+                    initialized = true;
+                    return;
+                }
+
+                await audioInputContext.audioWorklet.addModule("pcm-processor.js");
+                workletNode = new AudioWorkletNode(audioInputContext, "pcm-processor");
+                workletNode.connect(audioInputContext.destination);
+                initialized = true;
+                console.log("Audio context initialized successfully");
+            } catch (error) {
+                console.error("Failed to initialize audio context:", error);
+                // Continue without audio worklet
+                initialized = true;
+            }
         }
 
 
