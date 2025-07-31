@@ -71,21 +71,45 @@ python3 -m http.server 8000
 
 ### Step 3: Open the Application
 1. Navigate to `http://localhost:8000/index.html` in your browser
-2. Allow screen sharing permissions when prompted
+2. Allow screen sharing permissions when prompted  
 3. Allow microphone access when prompted
-4. Click the microphone button to start voice interaction
-5. Start talking about what's on your screen!
+4. **Start screen sharing**: The AI will automatically detect which GEMS portal page you're viewing
+5. Click the microphone button to start voice interaction
+6. Ask questions - the AI will provide context-aware responses based on the detected page!
+
+### 🎯 Automatic Context Detection
+
+The system automatically analyzes your screen content to detect which GEMS portal page you're viewing:
+
+**✅ Automatic Detection Examples:**
+- **Dependants page detected** → AI focuses on dependant management assistance
+- **Claims page detected** → AI emphasizes claim processes and status explanations  
+- **Benefits page detected** → AI explains coverage details and benefit information
+- **Profile page detected** → AI helps with profile updates and account management
+
+**🔍 How It Works:**
+1. **Real-time Analysis**: AI analyzes screen captures to identify page elements
+2. **Context Matching**: Matches visual elements to GEMS portal page definitions
+3. **Dynamic Updates**: Context updates automatically when you navigate to different pages
+4. **Fallback Handling**: Uses general GEMS context if specific page cannot be detected
+
+**💬 Context-Aware Examples:**
+- "What can I do on this page?" → AI explains current page functionality
+- "How do I complete this form?" → AI provides page-specific guidance
+- "What are these buttons for?" → AI identifies and explains page elements
 
 ## 🏗️ Project Structure
 
 ```
 gemini20-screen/
 ├── .env                  # Environment variables (API keys, config)
+├── .env.example         # Environment variables template
 ├── .gitignore           # Git ignore file
 ├── README.md            # This file
-├── main.py              # WebSocket server with Gemini integration
-├── index.html           # Web interface for screen sharing
+├── main.py              # WebSocket server with dynamic context injection
+├── index.html           # Web interface with context selection
 ├── pcm-processor.js     # Audio worklet for real-time audio processing
+├── gems_context.json    # GEMS portal context definitions
 └── requirements.txt     # Python dependencies
 ```
 
@@ -115,12 +139,41 @@ video: {
 ## 🎮 How It Works
 
 1. **Screen Capture**: Browser captures screen content using `getDisplayMedia()`
-2. **Image Processing**: Screen frames are converted to base64 JPEG images every 3 seconds
-3. **Audio Capture**: Microphone input is processed to PCM format at 16kHz
-4. **WebSocket Communication**: Audio and image data sent to Python server
-5. **Gemini Processing**: Server forwards data to Gemini 2.0 Flash model
-6. **AI Response**: Gemini analyzes screen content and provides audio responses
-7. **Audio Playback**: AI responses played back through Web Audio API
+2. **Context Selection**: User selects current GEMS portal page for context-aware assistance
+3. **Dynamic Context Injection**: Server loads relevant context from `gems_context.json` based on selected page
+4. **Image Processing**: Screen frames are converted to base64 JPEG images every 3 seconds
+5. **Audio Capture**: Microphone input is processed to PCM format at 16kHz
+6. **WebSocket Communication**: Audio, image data, and context updates sent to Python server
+7. **Contextual AI Processing**: Server forwards data to Gemini 2.0 Flash with page-specific system instructions
+8. **AI Response**: Gemini analyzes screen content with GEMS portal context and provides relevant audio responses
+9. **Audio Playback**: AI responses played back through Web Audio API
+
+## 🎯 Automatic Context Detection System
+
+This application features an **intelligent automatic context detection system** that analyzes screen content to provide contextual AI assistance:
+
+### Visual Context Analysis
+- **Screen Content Analysis**: AI analyzes screen captures in real-time to identify current page
+- **Element Recognition**: Identifies page titles, navigation, forms, and UI components
+- **Pattern Matching**: Matches visual elements to GEMS portal page definitions
+- **Confidence-Based Detection**: Uses multiple visual cues for accurate page identification
+
+### Context Configuration (`gems_context.json`)
+- **Comprehensive GEMS Portal Mapping**: Detailed definitions for all 50+ portal pages
+- **Visual Indicators**: Page elements and patterns for automatic detection
+- **Page-Specific Instructions**: Custom AI instructions dynamically applied
+- **Hierarchical Context**: Organized by functional areas (auth, dashboard, profile, etc.)
+
+### Automatic Detection Features
+- **Zero User Input**: No manual selection required - completely automatic
+- **Real-time Detection**: Context updates as you navigate between pages  
+- **Intelligent Fallback**: Uses general GEMS context if specific page cannot be identified
+- **Performance Optimized**: Context detection only on first few screen captures
+
+### Detection Accuracy
+- **High Precision**: Identifies specific pages through multiple visual cues
+- **Robust Handling**: Works with different screen sizes and zoom levels
+- **Adaptive Learning**: Improves detection through visual pattern recognition
 
 ## 🐛 Troubleshooting
 

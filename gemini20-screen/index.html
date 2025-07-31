@@ -47,6 +47,19 @@
         <main class="mdl-layout__content">
             <div class="page-content">
                 <div class="demo-content">
+                    <!-- Context Status Display -->
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%; max-width: 640px; margin-bottom: 20px;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">🎯 Auto-Detected Context</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <div id="contextStatus">
+                                <p id="detectedPage">🔍 Analyzing screen content...</p>
+                                <p id="contextDescription">The AI will automatically detect the current GEMS portal page from your screen.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Voice Control Buttons -->
                     <div class="button-group">
                         <button id="startButton"
@@ -184,15 +197,30 @@
         }
 
         function sendInitialSetupMessage() {
-
             console.log("sending setup message");
+            
             setup_client_message = {
                 setup: {
                     generation_config: { response_modalities: ["AUDIO"] },
                 },
+                auto_detect_context: true  // Enable automatic context detection
             };
 
+            console.log("Starting with automatic context detection");
             webSocket.send(JSON.stringify(setup_client_message));
+        }
+        
+        function updateContextDisplay(detectedContext) {
+            const detectedPageElement = document.getElementById('detectedPage');
+            const contextDescriptionElement = document.getElementById('contextDescription');
+            
+            if (detectedContext && detectedContext.title) {
+                detectedPageElement.innerHTML = `✅ Detected: <strong>${detectedContext.title}</strong> (${detectedContext.url})`;
+                contextDescriptionElement.textContent = detectedContext.description || "Context-aware assistance active.";
+            } else {
+                detectedPageElement.innerHTML = `🔍 Using general GEMS portal context`;
+                contextDescriptionElement.textContent = "AI will provide general assistance for the GEMS member portal.";
+            }
         }
 
 
@@ -223,6 +251,12 @@
         function receiveMessage(event) {
             const messageData = JSON.parse(event.data);
             const response = new Response(messageData);
+
+            // Handle context detection updates
+            if (messageData.type === "context_detected") {
+                updateContextDisplay(messageData.context);
+                return;
+            }
 
             if (response.text) {
                 displayMessage("GEMINI: " + response.text);
